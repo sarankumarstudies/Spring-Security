@@ -23,9 +23,7 @@ public class ProjectSecurityConfig {
            requests.anyRequest().authenticated());// Authenticate All the requests
          */
 
-        http.formLogin(flc->{
-           flc.disable();
-        } );
+        http.formLogin(withDefaults());
         http.httpBasic(withDefaults());
         return http.build();
     }
