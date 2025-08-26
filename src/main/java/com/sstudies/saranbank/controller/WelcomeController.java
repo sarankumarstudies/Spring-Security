@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class WelcomeController {
 
-@GetMapping("/ ")
+@GetMapping("/")
     public String welcomeNotice () {
         return "Welcome to the saran bank application";
     }
