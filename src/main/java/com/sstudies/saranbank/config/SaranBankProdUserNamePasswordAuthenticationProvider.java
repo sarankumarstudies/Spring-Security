@@ -1,9 +1,7 @@
 package com.sstudies.saranbank.config;
 
 
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.authenticator.BasicAuthenticator;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -16,9 +14,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile("prod")
 @RequiredArgsConstructor
-@Profile("!prod")
-public class SaranBankUserNamePasswordAuthenticationProvider implements AuthenticationProvider {
+public class SaranBankProdUserNamePasswordAuthenticationProvider implements AuthenticationProvider {
 
     /*
     DAOAuthenticationProvider is the default one.
@@ -40,15 +38,15 @@ public class SaranBankUserNamePasswordAuthenticationProvider implements Authenti
         String userName = authentication.getName();
         String password =  authentication.getCredentials().toString();
         UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
-        /*if (passwordEncoder.matches(password, userDetails.getPassword())){
+        if (passwordEncoder.matches(password, userDetails.getPassword())){
             // perform validation, custom validation we can write over here :)
 
             return new UsernamePasswordAuthenticationToken(userName, password ,userDetails.getAuthorities());
 
         }else {
             throw new BadCredentialsException("Invalid password!");
-        }*/
-        return new UsernamePasswordAuthenticationToken(userName, password ,userDetails.getAuthorities());
+        }
+
     }
 
     /**
