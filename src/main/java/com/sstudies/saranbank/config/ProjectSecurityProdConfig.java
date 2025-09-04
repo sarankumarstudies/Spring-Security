@@ -1,6 +1,8 @@
 package com.sstudies.saranbank.config;
 
 
+import com.sstudies.saranbank.exceptionHandling.CustomAccessDeniedHandler;
+import com.sstudies.saranbank.exceptionHandling.CustomBasicAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -18,12 +20,15 @@ public class ProjectSecurityProdConfig {
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.requiresChannel(rcc-> rcc.anyRequest().requiresSecure()).csrf(csrfConfig -> csrfConfig.disable()) // https
+            http.sessionManagement(smc-> smc.invalidSessionUrl("/invalidSession")).
+                     requiresChannel(rcc-> rcc.anyRequest().requiresSecure()).
+                csrf(csrfConfig -> csrfConfig.disable()) // https
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/myAccount", "/myBalance", "/myLoans", "/getMyCards").authenticated()
-                        .requestMatchers("/contacts", "/error", "/register", "getNotices").permitAll());
+                        .requestMatchers("/contacts", "/error", "/register", "getNotices", "/invalidSession").permitAll());
         http.formLogin(withDefaults());
-        http.httpBasic(withDefaults());
+        http.httpBasic(hbc-> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));
+        http.exceptionHandling(ebc-> ebc.accessDeniedHandler(new CustomAccessDeniedHandler()));
         return http.build();
     }
 
