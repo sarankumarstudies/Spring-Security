@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,15 +27,16 @@ public class ProjectSecurityConfig {
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.sessionManagement(smc-> smc.invalidSessionUrl("/invalidSession").maximumSessions((1)).maxSessionsPreventsLogin(true))
-                .csrf(csrfConfig -> csrfConfig.disable()) // Only Http
+        http.sessionManagement(smc -> smc
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // ✅ STATELESS for Basic Auth
+                .csrf(csrfConfig -> csrfConfig.disable())
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/myAccount", "/myBalance", "/myLoans", "/getMyCards").authenticated()
-                        .requestMatchers("/contacts", "/error", "/register", "getNotices","/invalidSession").permitAll());
+                        .requestMatchers("/contacts", "/error", "/register", "/getNotices", "/invalidSession").permitAll());
 
-        http.formLogin(withDefaults());
-        http.httpBasic(hbc-> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));
-        http.exceptionHandling(ebc-> ebc.accessDeniedHandler(new CustomAccessDeniedHandler()));
+        http.httpBasic(hbc -> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));
+        http.exceptionHandling(ebc -> ebc.accessDeniedHandler(new CustomAccessDeniedHandler()));
+
         return http.build();
     }
 
